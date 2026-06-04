@@ -40,6 +40,9 @@ BAD_INTERFACE_PHRASES = (
     "autonomous execution",
     "multi-agent task runner",
 )
+CLAUDE_OPTION_TOKENS = ("--model", "--effort")
+CLAUDE_DEFAULT_FLAGS = ("--model opus", "--effort high")
+CLAUDE_ALLOWED_EFFORTS = ("low", "medium", "high", "xhigh", "max")
 
 
 def fail(message: str) -> None:
@@ -143,6 +146,30 @@ def validate_skills() -> None:
             fail(f"public skill text contains bare invocation: {invocation}")
 
 
+def validate_claude_provider_options() -> None:
+    claude_text = read(SKILLS["ask-claude"])
+    router_text = read(SKILLS["ask"])
+
+    for token in CLAUDE_OPTION_TOKENS:
+        if token not in claude_text:
+            fail(f"ask-claude must document Claude option token: {token}")
+        if token in router_text:
+            fail(f"router skill must not document or advertise Claude option token: {token}")
+
+    for required in (
+        "[--model <model>] [--effort <effort>]",
+        "<resolved-model>",
+        "<resolved-effort>",
+        *CLAUDE_DEFAULT_FLAGS,
+    ):
+        if required not in claude_text:
+            fail(f"ask-claude missing model/effort contract text: {required}")
+
+    for effort in CLAUDE_ALLOWED_EFFORTS:
+        if not re.search(rf"\b{re.escape(effort)}\b", claude_text):
+            fail(f"ask-claude missing allowed effort value: {effort}")
+
+
 def validate_shared() -> None:
     text = read(SHARED)
     if FORBIDDEN_RUNTIME_REF in text:
@@ -184,6 +211,7 @@ def main() -> None:
     validate_marketplace()
     validate_manifest()
     validate_skills()
+    validate_claude_provider_options()
     validate_shared()
     validate_gitignore_and_shims()
     validate_simulated_plugin_root()

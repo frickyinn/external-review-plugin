@@ -7,12 +7,12 @@ Use it when you want Claude or CodeWhale to look at a plan, implementation, READ
 ## What it adds
 
 ```text
-$external-review:ask-claude <review task>
+$external-review:ask-claude [--model <model>] [--effort <effort>] <review task>
 $external-review:ask-codewhale <review task>
 $external-review:ask <prompt naming Claude or CodeWhale>
 ```
 
-- `$external-review:ask-claude` uses your local `claude` CLI.
+- `$external-review:ask-claude` uses your local `claude` CLI. It defaults to `--model opus --effort high`; pass leading `--model` or `--effort` options to override those values.
 - `$external-review:ask-codewhale` uses your local `codewhale` CLI.
 - `$external-review:ask` is only a router. It works when the prompt names exactly one provider; it will not choose a default or silently fall back.
 
@@ -51,6 +51,12 @@ Ask Claude for an implementation review:
 $external-review:ask-claude Review this implementation for correctness and missed edge cases.
 ```
 
+Ask Claude with an explicit model and effort:
+
+```text
+$external-review:ask-claude --model sonnet --effort medium Review README.md for install clarity.
+```
+
 Ask CodeWhale to inspect the current diff:
 
 ```text
@@ -70,7 +76,7 @@ If you want a repo to remember this workflow, copy this small policy into that r
 ```md
 ## External review policy
 
-For plan, code, or documentation reviews, use the External Review Codex plugin: `$external-review:ask-claude <review task>` or `$external-review:ask-codewhale <review task>`. Treat the result as advisory evidence, review the generated `.external-review/artifacts/` artifact, and verify advice against the repo docs, code, and tests.
+For plan, code, or documentation reviews, use the External Review Codex plugin: `$external-review:ask-claude [--model <model>] [--effort <effort>] <review task>` or `$external-review:ask-codewhale <review task>`. Treat the result as advisory evidence, review the generated `.external-review/artifacts/` artifact, and verify advice against the repo docs, code, and tests.
 ```
 
 ## Artifacts and privacy

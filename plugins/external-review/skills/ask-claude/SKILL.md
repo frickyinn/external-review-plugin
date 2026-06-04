@@ -10,10 +10,33 @@ Use the locally installed Claude CLI as a read-only external reviewer for focuse
 Official usage:
 
 ```bash
-$external-review:ask-claude <question or review task>
+$external-review:ask-claude [--model <model>] [--effort <effort>] <question or review task>
 ```
 
 Before execution, read and apply `../../shared/external-review-principles.md`.
+
+## Model and effort options
+
+Default to Claude Opus with high effort:
+
+```bash
+--model opus --effort high
+```
+
+Parse only these leading options before the review task:
+
+- `--model <model>`: pass the model value to Claude CLI. Accept aliases or full model names supported by the installed `claude` binary.
+- `--effort <effort>`: pass the effort value to Claude CLI. Allowed values are `low`, `medium`, `high`, `xhigh`, and `max`.
+
+Parsing rules:
+
+1. Parse options only while the next token is `--model` or `--effort`.
+2. Stop parsing at the first token that does not start with `--`; the remaining text is the review task.
+3. If the first unparsed token starts with `--`, reject it as an unknown leading option instead of treating it as task text.
+4. Require a value after each supported option.
+5. Do not treat later mentions of `--model` or `--effort` inside the review task as configuration after task parsing has started.
+
+If no options are provided, use `--model opus --effort high`. If the parsed effort is not one of `low`, `medium`, `high`, `xhigh`, or `max`, stop before invoking Claude and report the invalid value. If no review task remains after option parsing, stop and ask for a review task.
 
 ## Repo-aware review
 
@@ -23,6 +46,8 @@ Prefer a safe prompt-file/stdin pattern such as:
 
 ```bash
 timeout 600s claude -p \
+  --model <resolved-model> \
+  --effort <resolved-effort> \
   --no-session-persistence \
   --permission-mode default \
   --allowedTools Read Grep Glob LS \
@@ -53,7 +78,11 @@ The command above shows command shape only. Adjust flags to the installed Claude
 For bounded fixed-text questions where repository inspection is not needed, use Claude CLI with no session persistence and no repository context. If the installed Claude CLI supports fully disabling tools, use that supported flag; otherwise do not claim a no-tool guarantee. A safe fixed-text command shape is:
 
 ```bash
-claude -p --no-session-persistence --disable-slash-commands \
+claude -p \
+  --model <resolved-model> \
+  --effort <resolved-effort> \
+  --no-session-persistence \
+  --disable-slash-commands \
   < .external-review/tmp/claude-<slug>-<timestamp>.prompt.md
 ```
 
@@ -74,5 +103,7 @@ After Claude execution begins, save an artifact under:
 ```
 
 Capture exit code, stdout, stderr, and debug-file path when available. Follow the slug, timestamp, minimum-section, privacy, and temporary-file rules in `../../shared/external-review-principles.md`.
+
+Record the resolved model and effort in the artifact alongside the original user task, final short prompt, command shape, provider output, Codex synthesis, and action items.
 
 Task: {{ARGUMENTS}}
