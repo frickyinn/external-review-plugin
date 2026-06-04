@@ -37,6 +37,12 @@ codex plugin marketplace add frickyinn/external-review-plugin
 
 Then restart Codex, open `/plugins`, install **External Review**, and start a new Codex thread before using the skills.
 
+Updates with:
+
+```bash
+codex plugin marketplace upgrade external-review
+```
+
 ## Examples
 
 Ask Claude for an implementation review:
