@@ -36,10 +36,8 @@ CodeWhale is a terminal-native coding agent. Its official materials describe it 
 Add this repository as a Codex plugin marketplace:
 
 ```bash
-codex plugin marketplace add owner/external-review
+codex plugin marketplace add frickyinn/external-review-plugin
 ```
-
-Replace `owner/external-review` with the real GitHub owner and repository before publishing or installing from a fork.
 
 After adding the marketplace:
 
@@ -97,7 +95,7 @@ Artifacts may contain prompts, private paths, source excerpts, model output, or 
 
 ### The plugin does not appear in `/plugins`
 
-- Confirm the marketplace was added with `codex plugin marketplace add owner/external-review`.
+- Confirm the marketplace was added with `codex plugin marketplace add frickyinn/external-review-plugin`.
 - Run `codex plugin marketplace list` to inspect configured marketplace roots.
 - Restart Codex after changing marketplace configuration.
 - Confirm this repository contains `.agents/plugins/marketplace.json` and `plugins/external-review/.codex-plugin/plugin.json`.
@@ -166,7 +164,6 @@ Optional dogfood checks, when local provider CLIs are installed and authenticate
 
 Before publishing:
 
-- Replace `owner/external-review` placeholders with the real GitHub owner and repository.
 - Confirm `python3 plugins/external-review/scripts/validate_external_review_contract.py` passes.
 - Confirm `.agents/plugins/marketplace.json` points to `./plugins/external-review`.
 - Confirm `plugins/external-review/.codex-plugin/plugin.json` has the intended version, homepage, repository, and license.
