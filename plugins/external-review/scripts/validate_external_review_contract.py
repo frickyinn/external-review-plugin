@@ -19,6 +19,7 @@ PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = PLUGIN_ROOT.parents[1]
 MARKETPLACE = REPO_ROOT / ".agents" / "plugins" / "marketplace.json"
 PLUGIN_MANIFEST = PLUGIN_ROOT / ".codex-plugin" / "plugin.json"
+PUBLIC_REPO_URL = "https://github.com/frickyinn/external-review-plugin"
 SHARED = PLUGIN_ROOT / "shared" / "external-review-principles.md"
 SKILLS = {
     "ask": PLUGIN_ROOT / "skills" / "ask" / "SKILL.md",
@@ -77,6 +78,10 @@ def validate_manifest() -> None:
         fail("plugin manifest name must be external-review")
     if manifest.get("skills") != "./skills/":
         fail('plugin manifest skills must be "./skills/"')
+    for key in ("homepage", "repository"):
+        value = manifest.get(key)
+        if value != PUBLIC_REPO_URL:
+            fail(f"plugin manifest {key} must be {PUBLIC_REPO_URL}, got {value!r}")
     interface = manifest.get("interface") or {}
     interface_text = " ".join(
         str(value)
