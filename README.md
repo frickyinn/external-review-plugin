@@ -160,16 +160,6 @@ Optional dogfood checks, when local provider CLIs are installed and authenticate
 - Confirm prompts are short and do not paste broad repository context.
 - Confirm generated artifacts are reviewed before any commit or sharing.
 
-## Release checklist
-
-Before publishing:
-
-- Confirm `python3 plugins/external-review/scripts/validate_external_review_contract.py` passes.
-- Confirm `.agents/plugins/marketplace.json` points to `./plugins/external-review`.
-- Confirm `plugins/external-review/.codex-plugin/plugin.json` has the intended version, homepage, repository, and license.
-- Do not publish `.omx/`, `.external-review/tmp/`, or unsanitized local dogfood artifacts.
-- Review any artifact intentionally force-added under `.external-review/artifacts/` for private paths, source excerpts, model output, and secrets.
-
 ## License
 
 MIT. See [`LICENSE`](LICENSE).
