@@ -5,8 +5,8 @@
   "author": {
     "name": "frick"
   },
-  "homepage": "https://github.com/",
-  "repository": "https://github.com/",
+  "homepage": "https://github.com/owner/external-review",
+  "repository": "https://github.com/owner/external-review",
   "license": "MIT",
   "keywords": [
     "review",
@@ -27,8 +27,8 @@
       "Interactive"
     ],
     "defaultPrompt": [
-      "Ask CodeWhale for a read-only review of this plan",
-      "Ask Claude for a read-only second opinion on this implementation"
+      "Ask Claude for a read-only second opinion on this implementation",
+      "Ask CodeWhale for a read-only review of this plan"
     ],
     "brandColor": "#334155",
     "screenshots": []

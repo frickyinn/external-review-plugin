@@ -1,0 +1,17 @@
+{
+  "name": "external-review",
+  "plugins": [
+    {
+      "name": "external-review",
+      "source": {
+        "source": "local",
+        "path": "./plugins/external-review"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

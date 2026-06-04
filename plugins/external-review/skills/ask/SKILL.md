@@ -33,7 +33,7 @@ If the wording asks for the best, default, automatic, or recommended reviewer wi
 - Do not guess a provider from task type.
 - Do not call CodeWhale or Claude CLIs directly from this router.
 - Do not route through another global or unrelated skill.
-- Do not fallback to a different provider when the selected provider is unavailable.
+- Do not fall back to a different provider when the selected provider is unavailable.
 - Keep all provider execution details in the provider skills.
 
 ## Output expectation

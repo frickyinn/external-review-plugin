@@ -36,7 +36,7 @@ Do not build shell commands by directly interpolating user text into quoted stri
 
 ## Provider isolation
 
-Do not silently fallback across providers. If CodeWhale is unavailable, report a CodeWhale requirement for the CodeWhale skill. If Claude is unavailable, report a Claude requirement for the Claude skill.
+Do not silently fall back across providers. If CodeWhale is unavailable, report a CodeWhale requirement for the CodeWhale skill. If Claude is unavailable, report a Claude requirement for the Claude skill.
 
 ## Artifacts
 

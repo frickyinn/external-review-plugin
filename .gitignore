@@ -1,7 +1,17 @@
-# OMX runtime/workflow state is local and not an ask-codewhale product artifact.
+# Local OMX runtime/workflow state is not part of the external-review plugin package.
 .omx/
+
+# Historical ask-codewhale local dogfood state is not part of the public plugin package.
 .ask-codewhale/tmp/
+.ask-codewhale/artifacts/
+
 # CodeWhale local session/memory state from dogfood runs.
 .omc/
-# External Review artifacts are intentionally not ignored; review before staging.
+
+# External Review runtime outputs are local-only by default.
+# Force-add a reviewed/sanitized sample artifact only when intentionally shared.
 .external-review/tmp/
+.external-review/artifacts/
+
+# Local external-review planning/rules notes can contain machine-specific paths.
+docs/external_review_rules.md
