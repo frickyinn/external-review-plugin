@@ -1,3 +1,7 @@
 # OMX runtime/workflow state is local and not an ask-codewhale product artifact.
 .omx/
 .ask-codewhale/tmp/
+# CodeWhale local session/memory state from dogfood runs.
+.omc/
+# External Review artifacts are intentionally not ignored; review before staging.
+.external-review/tmp/

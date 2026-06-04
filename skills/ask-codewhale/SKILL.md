@@ -1,127 +1,75 @@
 ---
 name: ask-codewhale
-description: "Use when asking the local CodeWhale coding agent for cross review, second opinions, plan/code critique, or a simple delegated coding-agent task"
+description: Ask local CodeWhale for read-only external review, critique, or a second opinion using short repo-aware prompts and CodeWhale-specific execution rules.
 ---
 
 # Ask CodeWhale
 
-Use the locally installed CodeWhale CLI as an external coding-agent advisor for
-focused questions, cross review, plan/code critique, repo-aware review, or simple
-delegated tasks. This skill follows the local-advisor shape of OMX `ask` while
-keeping ask-codewhale artifacts in this repo's own namespace.
+Use the locally installed CodeWhale CLI as a read-only external reviewer for focused questions, plan/code critique, skill review, implementation review, and second opinions.
 
-## Usage
+Official usage:
 
 ```bash
-$ask-codewhale <question or task>
-codewhale exec <safe fixed-text prompt>
-codewhale --sandbox-mode read-only --approval-policy never -C <repo> \
-  exec --auto <safe repo-aware prompt>
-codewhale review <diff review target>
+$external-review:ask-codewhale <question or review task>
 ```
 
-The command examples above show command shape only. Pass user-supplied prompts
-safely; do not build shell commands by directly interpolating template variables
-into quoted strings.
+Before execution, read and apply `../../shared/external-review-principles.md`.
 
 ## Command selection
 
-Apply these precedence rules: use `codewhale review` only for actual diff
-targets; use plain `codewhale exec` only for fixed-text or no-tool questions;
-use `codewhale exec --auto` when CodeWhale must inspect the checkout or when the
-user explicitly delegates a task to CodeWhale.
+Apply these precedence rules:
 
-### Repo-aware review
+1. Use `codewhale review` only when an actual git diff target is the natural review target.
+2. Use plain `codewhale exec` only for fixed-text or no-tool advisor questions where repository inspection is not needed.
+3. Use `codewhale exec --auto` when CodeWhale should inspect the checkout itself.
 
-Use `codewhale exec --auto` for repository, implementation, skill, plan, or code
-reviews where CodeWhale should inspect the checkout itself.
+For repository, implementation, skill, plan, or code reviews, prefer a repo-aware read-only shape:
 
-- Prefer a read-only shape such as `codewhale --sandbox-mode read-only
-  --approval-policy never -C <repo> exec --auto <safe repo-aware prompt>`.
-- Send a concise prompt that names the task, target paths, constraints, and
-  expected output.
-- Do not paste large file contents, full repository context, broad diffs, or
-  untracked artifact bodies when CodeWhale can read the worktree itself.
-- Tell CodeWhale not to modify files for review tasks.
+```bash
+codewhale --sandbox-mode read-only --approval-policy never -C <repo> \
+  exec --auto <safe repo-aware prompt>
+```
 
-### Plain advisor questions
+The command above shows command shape only. Pass prompt text safely; do not splice user text into a shell string.
 
-Use plain `codewhale exec` for fixed-text, conceptual, or no-tool advisor
-questions where repository inspection is not needed.
+## Repo-aware review
 
-Examples include critiquing a short pasted paragraph, comparing concise design
-options, or asking a focused question whose answer does not depend on reading the
-checkout.
+Use `codewhale exec --auto` for review tasks where CodeWhale should inspect the checkout.
 
-### Git diff review
+- Send a concise prompt with the task, target paths, constraints, and expected output.
+- Do not paste broad repository context, full diffs, large file bodies, or untracked artifact contents when CodeWhale can read the worktree itself.
+- Tell CodeWhale not to modify files.
+- Keep filesystem posture read-only and approval policy noninteractive when available.
+
+## Git diff review
 
 Use `codewhale review` when a git diff is the natural review target.
 
 - Default diff source is the current working tree diff.
-- If the user specifies staged changes, a commit range, or another diff scope,
-  use that explicit scope.
-- If no usable diff exists but there is still a target path or prompt to review,
-  fall back to repo-aware `codewhale exec --auto` and explain the fallback.
-- If neither a diff nor a meaningful prompt target exists, stop with a precise
-  missing-target message.
+- If the user specifies staged changes, a commit range, or another diff scope, use that explicit scope.
+- If no usable diff exists but there is still a target path or prompt to review, use repo-aware `codewhale exec --auto` and explain the fallback.
+- If neither a diff nor a meaningful prompt target exists, stop with a precise missing-target message.
 
-### Delegated write tasks
+## Fixed-text advisor questions
 
-Use `codewhale exec --auto` for write-capable delegated tasks only when the user
-explicitly asks CodeWhale to perform the task, not merely review it.
+Use plain `codewhale exec` for bounded fixed-text or no-tool questions where repository inspection is not needed.
 
-Warn that this mode can have filesystem or shell side effects. Do not use it
-silently for destructive, external-production, credentialed, broad, or
-preference-dependent changes.
+## Read-only boundary
 
-## Prompt passing and shell safety
-
-Prefer one of these safe prompt-passing patterns:
-
-- pass arguments through an argv-safe command construction,
-- write the prompt to a temporary file and pass the file contents safely,
-- use a carefully quoted here-doc,
-- or use another non-interpolating mechanism provided by the execution
-  environment.
-
-Avoid command examples that directly splice user text into shell strings. Treat
-prompts as data, not shell syntax.
+This plugin excludes delegated write modes. Do not ask CodeWhale to edit files, run destructive actions, or perform credentialed/external-production work. If the user wants CodeWhale to perform writes, explain that this plugin is read-only and ask for a separate explicit workflow outside `external-review`.
 
 ## Local CLI requirement
 
-Prefer the local binary. If `codewhale` is missing, explain that the local
-CodeWhale CLI is required. Do not silently switch to an MCP server, remote
-provider, Claude, Gemini, Codex, or another coding agent.
+Prefer the local `codewhale` binary. If it is missing, report that CodeWhale is required for `external-review:ask-codewhale`. Do not switch to Claude or another provider.
 
 ## Artifact requirement
 
-After local execution, save a markdown artifact to:
+After CodeWhale execution begins, save an artifact under:
 
 ```text
-.ask-codewhale/artifacts/ask-codewhale-<slug>-<timestamp>.md
+.external-review/artifacts/external-review-codewhale-<slug>-<timestamp>.md
 ```
 
-Minimum sections:
-
-1. Original user task
-2. Backend and final prompt sent to CodeWhale
-3. Command shape, exit code, stdout, and stderr when available
-4. Raw or cleaned CodeWhale output
-5. Concise summary
-6. Action items / next steps
-
-If CodeWhale exits nonzero after execution begins, still save an artifact with
-the command, exit code, stdout/stderr, concise summary, and next steps. Treat
-CodeWhale output as advisory evidence; Codex remains responsible for synthesis
-and follow-up decisions.
-
-Artifacts may contain prompts, private paths, source excerpts, model output, or
-secrets. Review artifacts before committing or sharing them. Prefer structured or
-plain output such as `--json`, `--output-format stream-json`, or cleaned text
-when practical so artifacts are readable and not polluted by TUI control
-sequences.
-
-Use `.ask-codewhale/tmp/` only for temporary prompt/stdout/stderr scratch files.
-Temporary files should not be committed.
+Follow the slug, timestamp, minimum-section, privacy, and temporary-file rules in `../../shared/external-review-principles.md`.
 
 Task: {{ARGUMENTS}}

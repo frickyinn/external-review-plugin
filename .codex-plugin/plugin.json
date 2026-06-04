@@ -1,0 +1,36 @@
+{
+  "name": "external-review",
+  "version": "0.1.0",
+  "description": "Ask local external coding agents for read-only review, critique, and second opinions using short repo-aware prompts.",
+  "author": {
+    "name": "frick"
+  },
+  "homepage": "https://github.com/",
+  "repository": "https://github.com/",
+  "license": "MIT",
+  "keywords": [
+    "review",
+    "advisor",
+    "codewhale",
+    "claude",
+    "read-only",
+    "second-opinion"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "External Review",
+    "shortDescription": "Read-only external agent review",
+    "longDescription": "Use External Review to ask local external coding agents for read-only code, plan, skill, and implementation critique. It keeps prompts short, lets the selected reviewer inspect the checkout itself, and records advisory evidence without acting as a task runner.",
+    "developerName": "frick",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "Ask CodeWhale for a read-only review of this plan",
+      "Ask Claude for a read-only second opinion on this implementation"
+    ],
+    "brandColor": "#334155",
+    "screenshots": []
+  }
+}

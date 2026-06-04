@@ -10,7 +10,7 @@ Upgrade the current ask-codewhale skill into a namespaced plugin for read-only e
 ## Non-goals
 
 - Do not build a broad cross-agent orchestration or execution runtime.
-- Do not make external agents silently modify files.
+- Do not make external agents modify files. This plugin excludes delegated write modes; it is for read-only review/advice only.
 - Do not paste whole repository context, broad diffs, or large file bodies into external-agent prompts when the agent can inspect the checkout itself.
 - Do not depend on `docs/external_review_rules.md` as a runtime or skill source of truth; it is only planning reference material.
 - Do not route through or depend on any global `ask` skill outside this plugin.
@@ -41,12 +41,12 @@ The plugin should not advertise bare `$ask`, `$ask-codewhale`, or `$ask-claude` 
 Create this shared principles file:
 
 ```text
-skills/shared/external-review-principles.md
+shared/external-review-principles.md
 ```
 
 All provider and router skills reference this file. It owns the common contract:
 
-- Review/advisor mode is read-only by default.
+- Review/advisor mode is read-only by default and write delegation is out of scope.
 - Prompts are short and targeted: task, target paths, constraints, and requested output.
 - External agents should inspect the repository themselves when repo context is needed.
 - Prompts are data, not shell syntax; do not build shell commands by interpolating user text into quoted strings.
@@ -90,11 +90,12 @@ Implementation skill directory:
 skills/ask-codewhale/
 ```
 
-This provider keeps the current ask-codewhale behavior as the baseline.
+This provider keeps the current ask-codewhale read-only review/advisor behavior as the baseline. Existing delegated write-task guidance is intentionally excluded from the plugin cutover.
 
 Responsibilities:
 
 - Use CodeWhale for read-only external review, critique, and second opinions.
+- Do not include or advertise delegated write-task mode.
 - Prefer repo-aware, agentic review with a short prompt when CodeWhale should inspect the checkout.
 - Use the CodeWhale CLI command shape appropriate to the task:
   - `codewhale exec --auto` for repo-aware review where CodeWhale should inspect the checkout itself.
@@ -140,6 +141,8 @@ Artifact filenames should use this shape:
 ```text
 .external-review/artifacts/external-review-<provider>-<slug>-<timestamp>.md
 ```
+
+Slug format: lowercase ASCII kebab-case derived from the task, with non-alphanumeric runs collapsed to `-`, trimmed to 64 characters, and defaulting to `review` when empty. Timestamp format: UTC `YYYYMMDDTHHMMSSZ`. Dogfood artifacts are generated and retained locally for verification, but they are not automatically staged or committed; commit one only when it has been reviewed for sensitive content and is intentionally selected as durable evidence.
 
 Minimum artifact sections:
 
@@ -192,7 +195,7 @@ Artifacts may contain prompts, private paths, source excerpts, model output, or 
 - Manifest points to the plugin skill directory.
 - Namespaced skill surfaces exist for `external-review:ask`, `external-review:ask-codewhale`, and `external-review:ask-claude`.
 - Shared principles file exists and is referenced by all three skills.
-- Public skill text does not advertise bare `$ask` as the official plugin entrypoint.
+- Public skill text does not advertise bare `$ask`, `$ask-codewhale`, or `$ask-claude` as official plugin entrypoints.
 - Router text states high-confidence routing, ambiguity stop, and no fallback.
 - CodeWhale provider text preserves short prompt, agentic repo explore, read-only review, and artifact rules.
 - Claude provider text includes short prompt, allowed read-only tools, no session persistence, and artifact rules.
@@ -222,7 +225,8 @@ Artifacts may contain prompts, private paths, source excerpts, model output, or 
 - Official invocation is namespaced as `$external-review:*`.
 - Shared review principles are centralized rather than duplicated across provider skills.
 - `external-review:ask` is a thin router and does not call provider CLIs directly.
+- Delegated write modes are excluded from all provider skills.
 - Provider skills contain only provider-specific execution differences plus references to shared principles.
 - Prompts remain short and agentic; repo context is explored by the external agent.
-- Artifacts and temporary files live under `.external-review/`.
+- Artifacts and temporary files live under `.external-review/`, with fixed slug and timestamp rules.
 - No runtime or skill dependency is introduced on `docs/external_review_rules.md`.
